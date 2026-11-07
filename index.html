@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ali & Sude</title>
+
+<style>
+  :root{
+    --bg0:#06060a;
+    --bg1:#0b0b14;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.12);
+    --text: rgba(255,255,255,0.92);
+    --muted: rgba(255,255,255,0.70);
+    --shadow: 0 20px 70px rgba(0,0,0,0.60);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Poppins,system-ui,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(900px 500px at 20% 20%, rgba(255,94,168,.22), transparent 60%),
+      radial-gradient(900px 500px at 80% 30%, rgba(144,104,255,.20), transparent 60%),
+      linear-gradient(180deg,var(--bg0),var(--bg1));
+    min-height:100vh;
+  }
+
+  .btn{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    border:none;
+    border-radius:14px;
+    font-weight:800;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(90deg,rgba(255,94,168,.35),rgba(144,104,255,.35));
+  }
+
+  input,textarea{
+    width:100%;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.25);
+    color:#fff;
+  }
+  textarea{resize:none;height:120px}
+
+  .card{
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(10px);
+  }
+
+  /* LOGIN */
+  .login{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+
+  /* APP */
+  .app{display:none}
+  .topbar{
+    position:sticky;
+    top:0;
+    padding:14px;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.1);
+    z-index: 100;
+  }
+  .topbar-inner{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:relative;
+  }
+
+  .hamburger{
+    width:42px;height:42px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.2);
+    background:transparent;
+    position:relative;
+    cursor:pointer;
+  }
+  .hamburger span{
+    position:absolute;
+    left:11px;
+    width:18px;
+    height:2px;
+    background:#fff;
+  }
+  .hamburger span:nth-child(1){top:14px}
+  .hamburger span:nth-child(2){top:20px}
+  .hamburger span:nth-child(3){top:26px}
+
+  .menu{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    background:#0b0b14;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:14px;
+    width:200px;
+    padding:8px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+  .menu button{
+    width:100%;
+    background:none;
+    border:none;
+    color:#fff;
+    padding:12px;
+    text-align:left;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .menu button:hover{
+    background:rgba(255,255,255,0.1);
+    border-radius:8px;
+  }
+
+  .container{max-width:1100px;margin:auto;padding:16px}
+
+  .section{display:none}
+  .section.active{display:block}
+
+  #countup{margin-top:10px; font-size:1.2rem; font-weight:bold; color:rgba(255,255,255,0.95);}
+
+  /* GALLERY */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;
+    margin-top:14px;
+  }
+  .photo-frame{
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);
+    cursor:pointer;
+    position:relative;
+  }
+  .photo-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .photo-caption{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    background:rgba(0,0,0,0.65);
+    color:#fff;
+    padding:6px;
+    font-size:0.8rem;
+    text-align:center;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  .placeholder{
+    width:100%;height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#ccc;
+    font-style:italic;
+    text-align:center;
+    padding:10px;
+  }
+
+  /* LIGHTBOX */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.85);
+    z-index:9999;
+  }
+  .lightbox.open{display:flex}
+  .lightbox img{
+    max-width:95vw;
+    max-height:85vh;
+    border-radius:16px;
+  }
+  .lightbox-close{
+    position:fixed;
+    top:14px;
+    right:14px;
+    width:42px;height:42px;
+    border-radius:12px;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="card">
+    <h2>💜 Ali & Sude 💜</h2>
+    <input type="password" id="password" placeholder="Şifre">
+    <button class="btn" onclick="checkPassword()">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <strong>💞 Ali & Sude</strong>
+      <div style="position:relative">
+        <button class="hamburger" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="menu" id="menu">
+          <button onclick="go('home')">Ana Sayfa</button>
+          <button onclick="go('messages')">Gelen Mesajlar</button>
+          <button onclick="logout()">Çıkış</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- HOME -->
+    <div class="section active" id="home">
+      <div class="card">
+        <h3>Tanışma Sayacı</h3>
+        <div>10 Eylül 2026 • 01:16</div>
+        <div id="countup"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>Hatıralar</h3>
+
+        <div class="gallery">
+          <!-- İLK TANIŞMA RESMİ -->
+          <div class="photo-frame">
+            <img src="https://r.resimlink.com/rwks5v0YzuG.jpeg" alt="İlk Tanışma">
+            <div class="photo-caption">İlk Tanışma</div>
+          </div>
+
+          <!-- YEDEK ALANLAR -->
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+          <div class="photo-frame"><div class="placeholder">Resim yakında 💜</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="section" id="messages">
+      <div class="card">
+        <h3>Mesaj Bırak</h3>
+        <input id="first" placeholder="Ad">
+        <input id="last" placeholder="Soyad" style="margin-top:8px">
+        <textarea id="msg" placeholder="Mesaj"></textarea>
+        <button class="btn" onclick="send()">Gönder</button>
+        <div id="list" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLb()">✕</button>
+  <img id="lbImg">
+</div>
+
+<script>
+/* ŞİFRE */
+function checkPassword(){
+  const v=document.getElementById("password").value.toLowerCase();
+  if(v==="sude"){
+    login.style.display="none";
+    app.style.display="block";
+    load();
+    initGallery();
+  }else alert("Yanlış şifre");
+}
+
+/* MENU */
+function toggleMenu(){
+  const m = document.getElementById("menu");
+  m.style.display = m.style.display === "block" ? "none" : "block";
+}
+function go(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.getElementById("menu").style.display="none";
+}
+function logout(){
+  app.style.display="none";
+  login.style.display="flex";
+}
+
+/* SAYAÇ (10 Eylül 2026, 01:16) */
+const start=new Date(2026, 8, 10, 1, 16, 0); 
+function tick(){
+  const d=new Date()-start;
+  const g=Math.floor(d/86400000);
+  const s=Math.floor(d/3600000)%24;
+  const dk=Math.floor(d/60000)%60;
+  const sn=Math.floor(d/1000)%60;
+  countup.innerText=`${g} gün ${s} saat ${dk} dk ${sn} sn`;
+}
+setInterval(tick,1000);tick();
+
+/* LIGHTBOX */
+function initGallery(){
+  document.querySelectorAll(".photo-frame img").forEach(i=>{
+    i.onclick=()=>{lbImg.src=i.src;lightbox.classList.add("open")}
+  });
+}
+function closeLb(){lightbox.classList.remove("open")}
+
+/* MESAJLAR */
+const KEY="ali_sude_msgs";
+function send(){
+  if(!first.value||!last.value||!msg.value)return;
+  const a=JSON.parse(localStorage.getItem(KEY)||"[]");
+  a.unshift({
+    n:first.value+" "+last.value,
+    t:msg.value,
+    d:new Date().toLocaleString("tr-TR")
+  });
+  localStorage.setItem(KEY,JSON.stringify(a));
+  msg.value="";
+  load();
+}
+function load(){
+  const a=JSON.parse(localStorage.getItem(KEY)||"[]");
+  list.innerHTML=a.map(x=>`<p style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><b>${x.n}</b> • ${x.d}<br>${x.t}</p>`).join("");
+}
+</script>
+
+</body>
+</html>
